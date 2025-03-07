@@ -11,6 +11,7 @@ COOKIE = 'SECKEY_ABVK=PneWGxjnQ5vUuABNY0tjhvL+HebNvQt0P7XMHFz4ZVk%3D; BMAP_SECKE
 # 结果储存位置
 OUT_DIR = './output'
 
+
 """
 获得页面html解析后的soup对象
 """
@@ -60,15 +61,15 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
     data = [] # 二维数组
     for house in house_list:
         try:
-            ############# 根据标签找到你所需要的信息 #############
+            ############# TODO:根据标签找到你所需要的信息 #############
             title = house.find("div", class_="title").text.strip()
             dealDate = house.find("div", class_="dealDate").text.strip()
-            ####################################################
-            row = [title, dealDate] # 一维数组,把上面所有的变量都按字段顺序放进来
+            
+            row = [title, dealDate] # TODO:把上面所有的变量都按字段顺序放进来
+            #########################################################
             data.append(row)
         except Exception as e:
             print(f"爬取 {title} 失败，错误：{e}")
-
     return data
 
 
@@ -83,5 +84,6 @@ def save_as_csv(data:List[List[str]], columns:List[str], file_name:str) -> None:
 # 程序主入口
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 5)
+    # TODO: 把字段对应的表头顺序一一对应补充到这里
     info_columns = ['标题', '成交日期']
     save_as_csv(house_info, info_columns, '成交列表信息_P1-P5')
