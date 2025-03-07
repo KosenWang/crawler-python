@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 from typing import List
+import re
 
 # 链家基础地址
 BASE_URL = 'https://sz.lianjia.com/chengjiao/'
@@ -56,16 +57,19 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
     soup = get_html_soup(url)
     if soup == None:
         return []
-    house_list = soup.find_all('div', class_='info')
+    house_list:List[BeautifulSoup] = soup.find_all('div', class_='info')
     # 遍历house_list找到你需要的信息
     data = [] # 二维数组
     for house in house_list:
         try:
             ############# TODO:根据标签找到你所需要的信息 #############
-            title = house.find("div", class_="title").text.strip()
+            title_div = house.find('div', class_='title')
+            title = title_div.text.strip()
+            link = title_div.find('a').get('href')
+            id = parse_house_id(link)
             dealDate = house.find("div", class_="dealDate").text.strip()
-            
-            row = [title, dealDate] # TODO:把上面所有的变量都按字段顺序放进来
+            # TODO:把上面所有的变量都按字段顺序放进来
+            row = [id, title, dealDate, link] 
             #########################################################
             data.append(row)
         except Exception as e:
@@ -81,9 +85,24 @@ def save_as_csv(data:List[List[str]], columns:List[str], file_name:str) -> None:
     print(f"爬取完成，数据已保存到{file_path}")
 
 
+
+"""从链接中解析house的id"""
+def parse_house_id(url:str) -> str:
+    # 定义更通用的正则表达式模式
+    pattern = r'https?://[^/]+/chengjiao/(\d+)\.html'
+    # 使用re.search匹配URL
+    match = re.search(pattern, url)
+    
+    # 如果匹配成功，返回ID
+    if match:
+        return match.group(1)
+    else:
+        return None
+
+
 # 程序主入口
 if __name__ == "__main__":
     house_info = get_chengjiao_info_by_page(1, 5)
     # TODO: 把字段对应的表头顺序一一对应补充到这里
-    info_columns = ['标题', '成交日期']
+    info_columns = ['id', '标题', '成交日期', '链接']
     save_as_csv(house_info, info_columns, '成交列表信息_P1-P5')
