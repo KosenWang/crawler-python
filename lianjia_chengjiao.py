@@ -4,6 +4,7 @@ import pandas as pd
 import time
 from typing import List
 import re
+import logging
 
 # 链家基础地址
 BASE_URL = 'https://sz.lianjia.com/chengjiao/'
@@ -73,7 +74,9 @@ def get_chengjiao_info(url:str) -> List[List[str]]:
             #########################################################
             data.append(row)
         except Exception as e:
-            print(f"爬取 {url} 失败, 需重新登录, 错误：{e}")
+            print(f"爬取 {url} 失败")
+            logging.exception(e)
+            
     return data
 
 
@@ -135,7 +138,8 @@ def get_chengjiao_detail(url:str) -> List[str]:
 
         # TODO: 添加交易属性信息
     except Exception as e:
-        print(f"爬取 {url} 失败, 需重新登录, 错误：{e}")
+        print(f"爬取 {url} 失败")
+        logging.exception(e)
     return data
    
 
